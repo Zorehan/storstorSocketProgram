@@ -11,16 +11,19 @@ public class Server {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
+                System.out.println("New client connected from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clientHandlers.add(clientHandler);
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {
+            System.err.println("Error starting server: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     public static void broadcastMessage(String message, ClientHandler sender) {
+        System.out.println("Broadcasting message: " + message);
         for (ClientHandler client : clientHandlers) {
             if (client != sender) {
                 client.sendMessage(message);
@@ -39,6 +42,7 @@ public class Server {
                 this.out = new PrintWriter(socket.getOutputStream(), true);
                 this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             } catch (IOException e) {
+                System.err.println("Error setting up client handler: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -48,21 +52,25 @@ public class Server {
             try {
                 String message;
                 while ((message = in.readLine()) != null) {
-                    System.out.println("Received: " + message);
+                    System.out.println("Received from client: " + message);
                     Server.broadcastMessage(message, this);
                 }
             } catch (IOException e) {
+                System.err.println("Error reading from client: " + e.getMessage());
                 e.printStackTrace();
             } finally {
                 try {
                     socket.close();
+                    System.out.println("Client disconnected from " + socket.getInetAddress() + ":" + socket.getPort());
                 } catch (IOException e) {
+                    System.err.println("Error closing client socket: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
         }
 
         public void sendMessage(String message) {
+            System.out.println("Sending message to client: " + message);
             out.println(message);
         }
     }
