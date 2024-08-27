@@ -7,7 +7,7 @@ public class Client {
     private BufferedReader in;
     private PrintWriter out;
     private String username;
-    private static HashMap<String, String> navneServiceMap = new HashMap();
+    private static HashMap<String, String> navneServiceMap = new HashMap<>();
 
     public Client(String serverAddress, int serverPort, String username) {
         this.username = username;
@@ -29,7 +29,12 @@ public class Client {
         try (BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in))) {
             String message;
             while ((message = consoleReader.readLine()) != null) {
-                sendMessage(message);
+                if (message.toLowerCase().equals("info")) {
+                    System.out.println("the different users you can connect to: ");
+                    System.out.println(navneServiceMap.toString());
+                } else {
+                    sendMessage(message);
+                }
             }
         } catch (IOException e) {
             System.err.println("Error reading from console: " + e.getMessage());
@@ -43,9 +48,6 @@ public class Client {
     }
 
     private class IncomingReader implements Runnable {
-
-
-
         @Override
         public void run() {
             String message;
@@ -76,11 +78,13 @@ public class Client {
         String addressPort = navneServiceMap.get(serverUsername);
 
         if (addressPort == null) {
+            System.out.println("Server username not found in the service map.");
             return;
         }
 
         String[] parts = addressPort.split(" ");
         if (parts.length != 2) {
+            System.out.println("Invalid address and port format.");
             return;
         }
 
@@ -89,6 +93,7 @@ public class Client {
         try {
             port = Integer.parseInt(parts[1]);
         } catch (NumberFormatException e) {
+            System.out.println("Invalid port number format.");
             return;
         }
 

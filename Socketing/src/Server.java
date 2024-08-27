@@ -51,6 +51,9 @@ public class Server {
         public void run() {
             try {
                 String message;
+
+
+
                 while ((message = in.readLine()) != null) {
                     System.out.println("Received from client: " + message);
                     Server.broadcastMessage(message, this);
