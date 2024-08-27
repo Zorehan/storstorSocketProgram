@@ -1,11 +1,13 @@
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 
 public class Client {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     private String username;
+    private static HashMap<String, String> navneServiceMap = new HashMap();
 
     public Client(String serverAddress, int serverPort, String username) {
         this.username = username;
@@ -41,6 +43,9 @@ public class Client {
     }
 
     private class IncomingReader implements Runnable {
+
+
+
         @Override
         public void run() {
             String message;
@@ -56,15 +61,38 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        if (args.length != 3) {
-            System.out.println("Usage: java Client <server-address> <port> <username>");
+        navneServiceMap.put("Alex", "192.168.1.10 8080");
+        navneServiceMap.put("Mikkel", "192.168.1.11 8081");
+        navneServiceMap.put("Gerg", "10.10.131.241 9566");
+
+        if (args.length != 2) {
+            System.out.println("Usage: java Client <server-username> <client-username>");
             return;
         }
-        String serverAddress = args[0];
-        int serverPort = Integer.parseInt(args[1]);
-        String username = args[2];
 
-        Client client = new Client(serverAddress, serverPort, username);
+        String serverUsername = args[0];
+        String clientUsername = args[1];
+
+        String addressPort = navneServiceMap.get(serverUsername);
+
+        if (addressPort == null) {
+            return;
+        }
+
+        String[] parts = addressPort.split(" ");
+        if (parts.length != 2) {
+            return;
+        }
+
+        String ip = parts[0];
+        int port;
+        try {
+            port = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        Client client = new Client(ip, port, clientUsername);
         client.start();
     }
 }
