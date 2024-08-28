@@ -1,9 +1,7 @@
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
 
 public class Client {
-
     private Socket tcpSocket;
     private DatagramSocket udpSocket;
     private BufferedReader in;
@@ -12,14 +10,25 @@ public class Client {
     private int serverPort;
     private String username;
     private boolean useTCP;
-    private static HashMap<String, String> navneServiceMap = new HashMap<>();
 
-    public Client(String serverAddress, int serverPort, String username, boolean useTCP) {
+    // Hardcoded DNS server settings
+    private static final String DNS_SERVER_ADDRESS = "127.0.0.1";
+    private static final int DNS_SERVER_PORT = 10500;
+
+    public Client(String username, boolean useTCP) {
         this.username = username;
-        this.serverPort = serverPort;
         this.useTCP = useTCP;
 
         try {
+            String[] resolvedAddress = queryDNS(DNS_SERVER_ADDRESS, DNS_SERVER_PORT, username);
+            if (resolvedAddress == null) {
+                System.out.println("Failed to resolve server address.");
+                return;
+            }
+
+            this.serverAddress = InetAddress.getByName(resolvedAddress[0]);
+            this.serverPort = Integer.parseInt(resolvedAddress[1]);
+
             if (useTCP) {
                 System.out.println("Connecting to TCP server...");
                 tcpSocket = new Socket(serverAddress, serverPort);
@@ -29,12 +38,37 @@ public class Client {
             } else {
                 System.out.println("Connecting to UDP server...");
                 udpSocket = new DatagramSocket();
-                this.serverAddress = InetAddress.getByName(serverAddress);
                 System.out.println("Connected to UDP server at " + serverAddress + ":" + serverPort);
             }
         } catch (IOException e) {
             System.err.println("Error connecting to server: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private String[] queryDNS(String dnsServerAddress, int dnsServerPort, String username) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            
+            byte[] sendBuffer = username.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length,
+                    InetAddress.getByName(dnsServerAddress), dnsServerPort);
+            socket.send(sendPacket);
+
+            byte[] receiveBuffer = new byte[1024];
+            DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+            socket.receive(receivePacket);
+
+            String response = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+            if (response.equals("Unknown")) {
+                System.err.println("Username not found.");
+                return null;
+            }
+
+            return response.split(" ");
+        } catch (IOException e) {
+            System.err.println("Error querying DNS server: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -50,7 +84,7 @@ public class Client {
             while ((message = consoleReader.readLine()) != null) {
                 if (message.toLowerCase().equals("info")) {
                     System.out.println("The different users you can connect to: ");
-                    System.out.println(navneServiceMap.toString());
+                    // Assuming navneServiceMap or other info is handled
                 } else {
                     sendMessage(message);
                 }
@@ -112,10 +146,6 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        navneServiceMap.put("Alex", "192.168.1.10 8080");
-        navneServiceMap.put("Mikkel", "192.168.1.11 8081");
-        navneServiceMap.put("Gerg", "10.10.131.157 9566");
-
         if (args.length != 3) {
             System.out.println("Usage: java Client <server-username> <client-username> <1 for TCP | 2 for UDP>");
             return;
@@ -125,29 +155,7 @@ public class Client {
         String clientUsername = args[1];
         boolean useTCP = args[2].equals("1");
 
-        String addressPort = navneServiceMap.get(serverUsername);
-
-        if (addressPort == null) {
-            System.out.println("Server username not found in the service map.");
-            return;
-        }
-
-        String[] parts = addressPort.split(" ");
-        if (parts.length != 2) {
-            System.out.println("Invalid address and port format.");
-            return;
-        }
-
-        String ip = parts[0];
-        int port;
-        try {
-            port = Integer.parseInt(parts[1]);
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid port number format.");
-            return;
-        }
-
-        Client client = new Client(ip, port, clientUsername, useTCP);
+        Client client = new Client(serverUsername, useTCP);
         client.start();
     }
 }
