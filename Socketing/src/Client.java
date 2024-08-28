@@ -114,7 +114,7 @@ public class Client {
     public static void main(String[] args) {
         navneServiceMap.put("Alex", "192.168.1.10 8080");
         navneServiceMap.put("Mikkel", "192.168.1.11 8081");
-        navneServiceMap.put("Gerg", "10.10.131.241 9566");
+        navneServiceMap.put("Gerg", "10.10.131.157 9566");
 
         if (args.length != 3) {
             System.out.println("Usage: java Client <server-username> <client-username> <1 for TCP | 2 for UDP>");

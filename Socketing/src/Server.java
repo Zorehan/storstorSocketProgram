@@ -51,8 +51,9 @@ public class Server {
 
             while (true) {
                 datagramSocket.receive(receivePacket);
+                System.out.println(receivePacket.toString());
                 String message = new String(receivePacket.getData(), 0, receivePacket.getLength());
-
+                System.out.println(message);
                 InetSocketAddress clientAddress = new InetSocketAddress(receivePacket.getAddress(), receivePacket.getPort());
                 udpClients.add(clientAddress);
 
