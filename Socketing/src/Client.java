@@ -48,7 +48,10 @@ public class Client {
 
     private String[] queryDNS(String dnsServerAddress, int dnsServerPort, String username) {
         try (DatagramSocket socket = new DatagramSocket()) {
-            
+            System.out.println("Local adress" + socket.getLocalAddress());
+            System.out.println("inet adress" + socket.getInetAddress());
+            System.out.println("Local socket adress" + socket.getLocalSocketAddress());
+            System.out.println("Local adress" + socket.getLocalAddress());
             byte[] sendBuffer = username.getBytes();
             DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length,
                     InetAddress.getByName(dnsServerAddress), dnsServerPort);

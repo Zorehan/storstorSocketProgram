@@ -17,7 +17,8 @@ public class DNSServer {
     public static void main(String[] args) {
         try (DatagramSocket socket = new DatagramSocket(DNS_PORT)) {
             System.out.println("DNS server started on port " + DNS_PORT);
-
+            System.out.println(socket.getLocalAddress());
+            System.out.println(socket.getInetAddress());
             byte[] receiveBuffer = new byte[1024];
             DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
 
