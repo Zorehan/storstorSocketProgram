@@ -11,7 +11,6 @@ public class Client {
     private String username;
     private boolean useTCP;
 
-    // Hardcoded DNS server settings
     private static final String DNS_SERVER_ADDRESS = "127.0.0.1";
     private static final int DNS_SERVER_PORT = 10500;
 
@@ -87,7 +86,6 @@ public class Client {
             while ((message = consoleReader.readLine()) != null) {
                 if (message.toLowerCase().equals("info")) {
                     System.out.println("The different users you can connect to: ");
-                    // Assuming navneServiceMap or other info is handled
                 } else {
                     sendMessage(message);
                 }

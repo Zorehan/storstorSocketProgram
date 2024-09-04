@@ -12,6 +12,7 @@ public class DNSServer {
         userServerMap.put("Alex", "192.168.1.10 8080");
         userServerMap.put("Mikkel", "192.168.1.11 8081");
         userServerMap.put("Gerg", "10.10.131.157 9566");
+        userServerMap.put("Kasper", "10.10.132.45 6969");
     }
 
     public static void main(String[] args) {
