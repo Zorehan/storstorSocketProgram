@@ -17,6 +17,16 @@ public class TalkClient {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+    
+                OutputStream outputStream = socket.getOutputStream();
+    
+                outputStream.write('h');
+                outputStream.write('a');
+                outputStream.write('h');
+                outputStream.write('a');
+                outputStream.write('\n');
+    
+                outputStream.flush(); 
 
             // Starter en tråd til at lytte efter beskeder fra serveren
             Thread listenerThread = new Thread(() -> {

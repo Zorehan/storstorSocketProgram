@@ -54,6 +54,7 @@ public class TalkServer {
             System.out.println("Forbindelsen til klienten er lukket.");
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
 }
